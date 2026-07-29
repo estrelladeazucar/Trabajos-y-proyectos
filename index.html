@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosplay Traje de sacrificio divino - Vista previa de producto</title>
+    <!-- CSS Leaflet para el Mapa Interactivo -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --red: #d32f2f;
+            --red-hover: #b71c1c;
+            --gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --black-bg: #0d0d0d;
+            --white: #ffffff;
+            --dark-gray: #1a1a1a;
+            --border-gray: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--black-bg) 40%, var(--gold) 180%);
+            color: var(--white);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* Banner Negro */
+        header {
+            background-color: #000000;
+            border-bottom: 2px solid var(--red);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            background: rgba(13, 13, 13, 0.85);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        @media (max-width: 850px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        /* Galería/Imagen */
+        .product-image {
+            background: #000;
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 0 15px rgba(211, 47, 47, 0.4);
+        }
+
+        /* Detalles del Producto */
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .product-title {
+            font-size: 2rem;
+            color: var(--white);
+            border-bottom: 2px solid var(--red);
+            padding-bottom: 8px;
+        }
+
+        .price-tag {
+            font-size: 2.2rem;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .price-breakdown {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-weight: bold;
+            color: var(--gold-light);
+            font-size: 0.95rem;
+        }
+
+        select, input {
+            padding: 10px;
+            background-color: var(--dark-gray);
+            border: 1px solid var(--border-gray);
+            color: var(--white);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--red);
+        }
+
+        /* Tabla de Ahorro */
+        .discount-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+            font-size: 0.85rem;
+            background-color: #000;
+            border: 1px solid var(--border-gray);
+        }
+
+        .discount-table th, .discount-table td {
+            border: 1px solid var(--border-gray);
+            padding: 8px;
+            text-align: center;
+        }
+
+        .discount-table th {
+            background-color: var(--red);
+            color: var(--white);
+        }
+
+        /* Complemento opcional */
+        .addon-box {
+            background: rgba(211, 47, 47, 0.1);
+            border: 1px dashed var(--red);
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .addon-box input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--red);
+        }
+
+        /* Botón principal */
+        .btn-buy {
+            background-color: var(--red);
+            color: var(--white);
+            padding: 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .btn-buy:hover {
+            background-color: var(--red-hover);
+            box-shadow: 0 0 10px rgba(211, 47, 47, 0.6);
+        }
+
+        /* Mapa */
+        #map {
+            height: 180px;
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid var(--gold);
+            margin-top: 5px;
+        }
+
+        /* Modal / Pop-up */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--dark-gray);
+            border: 2px solid var(--gold);
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .modal-content h2 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--red);
+            padding-bottom: 5px;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 1.5rem;
+            color: var(--white);
+            cursor: pointer;
+        }
+
+        /* Ticket de Compra */
+        .receipt {
+            display: none;
+            background: #fff;
+            color: #000;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            margin-top: 15px;
+        }
+
+        .receipt h3 { text-align: center; margin-bottom: 10px; text-transform: uppercase; }
+        .receipt-line { display: flex; justify-content: space-between; margin: 4px 0; }
+        .receipt-divider { border-top: 1px dashed #000; margin: 10px 0; }
+        
+        .btn-print {
+            background: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Tienda del Circo Errante</h1>
+        <span style="color: var(--gold-light);">Edición Festival del Dios Maligno</span>
+    </header>
+
+    <div class="container">
+        <!-- Columna Izquierda: Galería e Información -->
+        <div class="product-image">
+            <img src="https://i.pinimg.com/736x/dd/fb/31/ddfb31cb60de21b788bd47783d5574db.jpg" alt="Cosplay Bai Liu">
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #ccc;">
+                Incluye: Traje completo estilo kimono (blanco/negro con patrones wabi-sabi complejos) + Instrumento ritual Kagura Suzu sintoísta con cintas.
+            </p>
+        </div>
+
+        <!-- Columna Derecha: Opciones y Cálculo -->
+        <div class="product-details">
+            <h2 class="product-title">Cosplay Traje de sacrificio divino</h2>
+            
+            <div>
+                <div class="price-tag" id="display-price">$999.00 MXN</div>
+                <div class="price-breakdown" id="display-subtotal">Subtotal: $861.21 + IVA (16%): $137.79</div>
+            </div>
+
+            <!-- Variantes -->
+            <div class="form-group">
+                <label for="size">Variante de Talla:</label>
+                <select id="size" onchange="calculateTotal()">
+                    <option value="ch">Chica (CH) - Base ($999.00)</option>
+                    <option value="m">Mediana (M) - (+$100.00)</option>
+                    <option value="g">Grande (G) - (+$200.00)</option>
+                </select>
+            </div>
+
+            <!-- Cantidad y Mayoreo -->
+            <div class="form-group">
+                <label for="quantity">Cantidad (Precios por Mayoreo):</label>
+                <input type="number" id="quantity" value="1" min="1" max="50" onchange="calculateTotal()">
+            </div>
+
+            <!-- Tabla Ahorro Mayoreo -->
+            <div>
+                <label>Descuentos por Mayoreo Aplicados:</label>
+                <table class="discount-table">
+                    <thead>
+                        <tr>
+                            <th>Piezas</th>
+                            <th>Descuento</th>
+                            <th>Ahorro Estimado (Pza)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1 - 2</td>
+                            <td>0%</td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>3 - 5</td>
+                            <td>10%</td>
+                            <td>~$100.00</td>
+                        </tr>
+                        <tr>
+                            <td>6+</td>
+                            <td>20%</td>
+                            <td>~$200.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Complemento Adicional -->
+            <div class="addon-box">
+                <input type="checkbox" id="addon" onchange="calculateTotal()">
+                <label for="addon" style="cursor:pointer;">
+                    Agregar <strong>Látigo de Espinas</strong> (+$399.00)
+                </label>
+            </div>
+
+            <!-- Distancia y Mapa -->
+            <div class="form-group">
+                <label for="distance">Calcular Envío por Distancia (km):</label>
+                <input type="range" id="distance" min="5" max="500" value="50" oninput="updateDistance(this.value)">
+                <span id="distance-val" style="font-size:0.85rem; color:var(--gold);">50 km - Envío: $150.00 MXN</span>
+                <!-- Mapa Interactivo (Tecnología Externa: Leaflet.js) -->
+                <div id="map"></div>
+            </div>
+
+            <!-- Botón de Compra -->
+            <button class="btn-buy" onclick="openModal()">Comprar Ahora</button>
+        </div>
+    </div>
+
+    <!-- Modal Formulario de Pago -->
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2>Confirmar Compra</h2>
+            
+            <form id="paymentForm" onsubmit="processPayment(event)">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Nombre Completo:</label>
+                    <input type="text" required placeholder="Ej. Bai Liu" value="Bai Liu">
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Correo Electrónico:</label>
+                    <input type="email" required placeholder="correo@ejemplo.com" value="bailiu@game.com">
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Número de Tarjeta (Ficticio):</label>
+                    <input type="text" required placeholder="4532 XXXX XXXX 8901" maxlength="16" value="4532123456788901">
+                </div>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Vencimiento:</label>
+                        <input type="text" placeholder="MM/AA" required value="12/28">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>CVV:</label>
+                        <input type="password" placeholder="123" maxlength="3" required value="777">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-buy" style="width: 100%;">Finalizar Pago</button>
+            </form>
+
+            <!-- Recibo / Ticket final -->
+            <div class="receipt" id="receiptBlock">
+                <h3>*** Ticket de Compra ***</h3>
+                <p style="text-align: center; font-size: 0.8rem;">Tienda Circo Errante S.A.</p>
+                <div class="receipt-divider"></div>
+                <div class="receipt-line"><span>Producto:</span><span>Cosplay Traje de sacrificio divino</span></div>
+                <div class="receipt-line"><span>Talla:</span><span id="rec-size">-</span></div>
+                <div class="receipt-line"><span>Cantidad:</span><span id="rec-qty">-</span></div>
+                <div class="receipt-line"><span>Precio Base U.:</span><span id="rec-base">-</span></div>
+                <div class="receipt-line"><span>Desc. Mayoreo:</span><span id="rec-disc">-</span></div>
+                <div class="receipt-line"><span>Látigo Espinas:</span><span id="rec-addon">-</span></div>
+                <div class="receipt-line"><span>Costo Envío:</span><span id="rec-ship">-</span></div>
+                <div class="receipt-divider"></div>
+                <div class="receipt-line"><span>Subtotal:</span><span id="rec-sub">-</span></div>
+                <div class="receipt-line"><span>IVA (16%):</span><span id="rec-tax">-</span></div>
+                <div class="receipt-line" style="font-weight: bold; font-size: 1.1rem;"><span>TOTAL:</span><span id="rec-total">-</span></div>
+                <div class="receipt-divider"></div>
+                <p style="text-align: center; font-size:0.75rem;">¡Gracias por tu compra!</p>
+                
+                <!-- Tecnología Externa Extra: Generación de impresión local -->
+                <button class="btn-print" onclick="window.print()">Imprimir Recibo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Leaflet para Mapas -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Variables globales de cálculo
+        let basePrices = { 'ch': 999.00, 'm': 1099.00, 'g': 1199.00 };
+        let addonPrice = 399.00;
+        let map, marker;
+
+        // Inicialización
+        window.onload = function() {
+            initMap();
+            calculateTotal();
+        };
+
+        // Función para inicializar Mapa Interactivo
+        function initMap() {
+            // Coordenadas iniciales (Centro)
+            map = L.map('map').setView([19.4326, -99.1332], 7); 
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            marker = L.marker([19.4326, -99.1332]).addTo(map)
+                .bindPopup('Punto de Entrega Estimado')
+                .openPopup();
+        }
+
+        // Actualizar distancia y mover marcador en el mapa
+        function updateDistance(val) {
+            let shippingCost = val * 3; // $3 MXN por KM
+            document.getElementById('distance-val').innerText = `${val} km - Envío: $${shippingCost.toFixed(2)} MXN`;
+            
+            // Simular cambio en el mapa moviendo la latitud levemente según la distancia
+            let newLat = 19.4326 + (val * 0.005);
+            let newLng = -99.1332 + (val * 0.005);
+            marker.setLatLng([newLat, newLng]);
+            map.panTo([newLat, newLng]);
+
+            calculateTotal();
+        }
+
+        // Aplicación de Precio Psicológico (Ajustar a terminado .00 o .99)
+        function applyPsychologicalPrice(amount) {
+            // Devuelve valor con formato de precio impar o redondo (.00 / .99)
+            return Math.floor(amount) + 0.99;
+        }
+
+        // Lógica de cálculo general
+        function calculateTotal() {
+            let size = document.getElementById('size').value;
+            let qty = parseInt(document.getElementById('quantity').value) || 1;
+            let hasAddon = document.getElementById('addon').checked;
+            let distance = parseInt(document.getElementById('distance').value);
+
+            // 1. Precio base según talla
+            let unitPrice = basePrices[size];
+
+            // 2. Regla de descuento por mayoreo
+            let discountRate = 0;
+            if (qty >= 6) {
+                discountRate = 0.20; // 20%
+            } else if (qty >= 3) {
+                discountRate = 0.10; // 10%
+            }
+
+            let discountedUnitPrice = unitPrice * (1 - discountRate);
+            
+            // Aplicar precio psicológico al precio unitario con descuento
+            discountedUnitPrice = applyPsychologicalPrice(discountedUnitPrice);
+
+            let productTotal = discountedUnitPrice * qty;
+
+            // 3. Adicionales
+            if (hasAddon) {
+                productTotal += (addonPrice * qty);
+            }
+
+            // 4. Envío
+            let shippingTotal = distance * 3;
+
+            // 5. Total Bruto (Incluye producto + envío)
+            let grandTotal = productTotal + shippingTotal;
+
+            // 6. Desglose de IVA (16%)
+            let subtotal = grandTotal / 1.16;
+            let tax = grandTotal - subtotal;
+
+            // Renderizar en UI
+            document.getElementById('display-price').innerText = `$${grandTotal.toFixed(2)} MXN`;
+            document.getElementById('display-subtotal').innerText = `Subtotal: $${subtotal.toFixed(2)} + IVA (16%): $${tax.toFixed(2)}`;
+
+            return {
+                size: size.toUpperCase(),
+                qty: qty,
+                unitPrice: unitPrice,
+                discountRate: discountRate * 100,
+                hasAddon: hasAddon,
+                shippingTotal: shippingTotal,
+                subtotal: subtotal,
+                tax: tax,
+                grandTotal: grandTotal
+            };
+        }
+
+        // Abrir y Cerrar Modal
+        function openModal() {
+            document.getElementById('checkoutModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('checkoutModal').style.display = 'none';
+        }
+
+        // Procesar Pago y Emitir Recibo
+        function processPayment(e) {
+            e.preventDefault();
+            let data = calculateTotal();
+
+            // Llenar Recibo
+            document.getElementById('rec-size').innerText = data.size;
+            document.getElementById('rec-qty').innerText = data.qty;
+            document.getElementById('rec-base').innerText = `$${data.unitPrice.toFixed(2)}`;
+            document.getElementById('rec-disc').innerText = `${data.discountRate}%`;
+            document.getElementById('rec-addon').innerText = data.hasAddon ? `$${(addonPrice * data.qty).toFixed(2)}` : '$0.00';
+            document.getElementById('rec-ship').innerText = `$${data.shippingTotal.toFixed(2)}`;
+            document.getElementById('rec-sub').innerText = `$${data.subtotal.toFixed(2)}`;
+            document.getElementById('rec-tax').innerText = `$${data.tax.toFixed(2)}`;
+            document.getElementById('rec-total').innerText = `$${data.grandTotal.toFixed(2)}`;
+
+            // Ocultar Formulario y Mostrar Ticket
+            document.getElementById('paymentForm').style.display = 'none';
+            document.getElementById('receiptBlock').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
