@@ -67,7 +67,7 @@
             .container { grid-template-columns: 1fr; }
         }
 
-        /* Galería/Imagen */
+        /* GalerÃ­a/Imagen */
         .product-image {
             background: #000;
             border: 2px solid var(--gold);
@@ -137,6 +137,31 @@
             border-color: var(--red);
         }
 
+        /* Buscador de DirecciÃ³n */
+        .address-search {
+            display: flex;
+            gap: 5px;
+        }
+
+        .address-search input {
+            flex: 1;
+        }
+
+        .address-search button {
+            background-color: var(--red);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .address-search button:hover {
+            background-color: var(--red-hover);
+        }
+
         /* Tabla de Ahorro */
         .discount-table {
             width: 100%;
@@ -175,7 +200,7 @@
             accent-color: var(--red);
         }
 
-        /* Botón principal */
+        /* BotÃ³n principal */
         .btn-buy {
             background-color: var(--red);
             color: var(--white);
@@ -273,19 +298,19 @@
 
     <header>
         <h1>Tienda del Circo Errante</h1>
-        <span style="color: var(--gold-light);">Edición Festival del Dios Maligno</span>
+        <span style="color: var(--gold-light);">EdiciÃ³n Festival del Dios Maligno</span>
     </header>
 
     <div class="container">
-        <!-- Columna Izquierda: Galería e Información -->
+        <!-- Columna Izquierda: GalerÃ­a e InformaciÃ³n -->
         <div class="product-image">
-            <img src="https://i.pinimg.com/736x/dd/fb/31/ddfb31cb60de21b788bd47783d5574db.jpg" alt="Cosplay Bai Liu">
+            <img src="https://i.pinimg.com/736x/dd/fb/31/ddfb31cb60de21b788bd47783d5574db.jpg" alt="Cosplay Traje de sacrificio divino">
             <p style="margin-top: 15px; font-size: 0.9rem; color: #ccc;">
-                Incluye: Traje completo estilo kimono (blanco/negro con patrones wabi-sabi complejos) + Instrumento ritual Kagura Suzu sintoísta con cintas.
+                Incluye: Traje completo estilo kimono (blanco/negro con patrones wabi-sabi complejos) + Instrumento ritual Kagura Suzu sintoÃ­sta con cintas.
             </p>
         </div>
 
-        <!-- Columna Derecha: Opciones y Cálculo -->
+        <!-- Columna Derecha: Opciones y CÃ¡lculo -->
         <div class="product-details">
             <h2 class="product-title">Cosplay Traje de sacrificio divino</h2>
             
@@ -345,20 +370,27 @@
             <div class="addon-box">
                 <input type="checkbox" id="addon" onchange="calculateTotal()">
                 <label for="addon" style="cursor:pointer;">
-                    Agregar <strong>Látigo de Espinas</strong> (+$399.00)
+                    Agregar <strong>LÃ¡tigo de Espinas</strong> (+$399.00)
                 </label>
             </div>
 
-            <!-- Distancia y Mapa -->
+            <!-- DirecciÃ³n de Entrega y Mapa Interactivo -->
             <div class="form-group">
-                <label for="distance">Calcular Envío por Distancia (km):</label>
+                <label for="destination-input">Lugar / DirecciÃ³n de Entrega:</label>
+                <div class="address-search">
+                    <input type="text" id="destination-input" placeholder="Ej. Ciudad de MÃ©xico, Monterrey, Guadalajara..." value="Ciudad de MÃ©xico">
+                    <button type="button" onclick="searchDestination()">Buscar</button>
+                </div>
+
+                <label for="distance" style="margin-top: 10px;">Ajustar Distancia Manual (km):</label>
                 <input type="range" id="distance" min="5" max="500" value="50" oninput="updateDistance(this.value)">
-                <span id="distance-val" style="font-size:0.85rem; color:var(--gold);">50 km - Envío: $150.00 MXN</span>
-                <!-- Mapa Interactivo (Tecnología Externa: Leaflet.js) -->
+                <span id="distance-val" style="font-size:0.85rem; color:var(--gold);">50 km - EnvÃ­o: $150.00 MXN</span>
+                
+                <!-- Mapa Interactivo (Leaflet.js) -->
                 <div id="map"></div>
             </div>
 
-            <!-- Botón de Compra -->
+            <!-- BotÃ³n de Compra -->
             <button class="btn-buy" onclick="openModal()">Comprar Ahora</button>
         </div>
     </div>
@@ -375,11 +407,15 @@
                     <input type="text" required placeholder="Ej. Bai Liu" value="Bai Liu">
                 </div>
                 <div class="form-group" style="margin-bottom: 10px;">
-                    <label>Correo Electrónico:</label>
+                    <label>Correo ElectrÃ³nico:</label>
                     <input type="email" required placeholder="correo@ejemplo.com" value="bailiu@game.com">
                 </div>
                 <div class="form-group" style="margin-bottom: 10px;">
-                    <label>Número de Tarjeta (Ficticio):</label>
+                    <label>DirecciÃ³n de Entrega Confirmada:</label>
+                    <input type="text" id="modal-address" required readonly style="background-color: #2a2a2a; color: #d4af37;">
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>NÃºmero de Tarjeta (Ficticio):</label>
                     <input type="text" required placeholder="4532 XXXX XXXX 8901" maxlength="16" value="4532123456788901">
                 </div>
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
@@ -401,21 +437,21 @@
                 <h3>*** Ticket de Compra ***</h3>
                 <p style="text-align: center; font-size: 0.8rem;">Tienda Circo Errante S.A.</p>
                 <div class="receipt-divider"></div>
-                <div class="receipt-line"><span>Producto:</span><span>Cosplay Traje de sacrificio divino</span></div>
+                <div class="receipt-line"><span>Producto:</span><span>Sacrificio Divino</span></div>
+                <div class="receipt-line"><span>Destino:</span><span id="rec-dest">-</span></div>
                 <div class="receipt-line"><span>Talla:</span><span id="rec-size">-</span></div>
                 <div class="receipt-line"><span>Cantidad:</span><span id="rec-qty">-</span></div>
                 <div class="receipt-line"><span>Precio Base U.:</span><span id="rec-base">-</span></div>
                 <div class="receipt-line"><span>Desc. Mayoreo:</span><span id="rec-disc">-</span></div>
-                <div class="receipt-line"><span>Látigo Espinas:</span><span id="rec-addon">-</span></div>
-                <div class="receipt-line"><span>Costo Envío:</span><span id="rec-ship">-</span></div>
+                <div class="receipt-line"><span>LÃ¡tigo Espinas:</span><span id="rec-addon">-</span></div>
+                <div class="receipt-line"><span>Costo EnvÃ­o:</span><span id="rec-ship">-</span></div>
                 <div class="receipt-divider"></div>
                 <div class="receipt-line"><span>Subtotal:</span><span id="rec-sub">-</span></div>
                 <div class="receipt-line"><span>IVA (16%):</span><span id="rec-tax">-</span></div>
                 <div class="receipt-line" style="font-weight: bold; font-size: 1.1rem;"><span>TOTAL:</span><span id="rec-total">-</span></div>
                 <div class="receipt-divider"></div>
-                <p style="text-align: center; font-size:0.75rem;">¡Gracias por tu compra!</p>
+                <p style="text-align: center; font-size:0.75rem;">Â¡Gracias por tu compra!</p>
                 
-                <!-- Tecnología Externa Extra: Generación de impresión local -->
                 <button class="btn-print" onclick="window.print()">Imprimir Recibo</button>
             </div>
         </div>
@@ -424,92 +460,122 @@
     <!-- JS Leaflet para Mapas -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Variables globales de cálculo
+        // Variables globales
         let basePrices = { 'ch': 999.00, 'm': 1099.00, 'g': 1199.00 };
         let addonPrice = 399.00;
-        let map, marker;
+        let map, marker, routeLine;
+        
+        // Coordenadas de origen (AlmacÃ©n Central)
+        const originCoords = [19.2826, -99.6556];
 
-        // Inicialización
+        // InicializaciÃ³n
         window.onload = function() {
             initMap();
             calculateTotal();
         };
 
-        // Función para inicializar Mapa Interactivo
+        // FunciÃ³n para inicializar Mapa Interactivo
         function initMap() {
-            // Coordenadas iniciales (Centro)
             map = L.map('map').setView([19.4326, -99.1332], 7); 
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
+                attribution: 'Â© OpenStreetMap'
             }).addTo(map);
 
+            // Marcador de origen (AlmacÃ©n)
+            L.marker(originCoords).addTo(map).bindPopup('AlmacÃ©n Central (Origen)');
+
+            // Marcador de destino
             marker = L.marker([19.4326, -99.1332]).addTo(map)
                 .bindPopup('Punto de Entrega Estimado')
                 .openPopup();
+
+            // LÃ­nea visual de ruta
+            routeLine = L.polyline([originCoords, [19.4326, -99.1332]], {color: 'red', weight: 3, dashArray: '5, 10'}).addTo(map);
         }
 
-        // Actualizar distancia y mover marcador en el mapa
+        // Buscar ubicaciÃ³n real por geocodificaciÃ³n gratuita (Nominatim)
+        function searchDestination() {
+            let query = document.getElementById('destination-input').value;
+            if(!query) return;
+
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        let lat = parseFloat(data[0].lat);
+                        let lon = parseFloat(data[0].lon);
+
+                        marker.setLatLng([lat, lon]).bindPopup(`Destino: ${data[0].display_name}`).openPopup();
+                        routeLine.setLatLngs([originCoords, [lat, lon]]);
+                        map.fitBounds([originCoords, [lat, lon]], {padding: [30, 30]});
+
+                        // Calcular distancia Haversine exacta
+                        let distKm = calculateDistanceInKm(originCoords[0], originCoords[1], lat, lon);
+                        distKm = Math.max(5, Math.min(500, Math.round(distKm)));
+                        
+                        document.getElementById('distance').value = distKm;
+                        updateDistance(distKm);
+                    } else {
+                        alert("No se encontrÃ³ la ubicaciÃ³n. Intenta con otra ciudad o direcciÃ³n.");
+                    }
+                })
+                .catch(err => alert("Error al buscar la ubicaciÃ³n."));
+        }
+
+        // CÃ¡lculo de distancia entre coordenadas (Km)
+        function calculateDistanceInKm(lat1, lon1, lat2, lon2) {
+            let R = 6371;
+            let dLat = (lat2 - lat1) * Math.PI / 180;
+            let dLon = (lon2 - lon1) * Math.PI / 180;
+            let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Actualizar distancia en Slider
         function updateDistance(val) {
             let shippingCost = val * 3; // $3 MXN por KM
-            document.getElementById('distance-val').innerText = `${val} km - Envío: $${shippingCost.toFixed(2)} MXN`;
-            
-            // Simular cambio en el mapa moviendo la latitud levemente según la distancia
-            let newLat = 19.4326 + (val * 0.005);
-            let newLng = -99.1332 + (val * 0.005);
-            marker.setLatLng([newLat, newLng]);
-            map.panTo([newLat, newLng]);
-
+            document.getElementById('distance-val').innerText = `${val} km - EnvÃ­o: $${shippingCost.toFixed(2)} MXN`;
             calculateTotal();
         }
 
-        // Aplicación de Precio Psicológico (Ajustar a terminado .00 o .99)
+        // AplicaciÃ³n de Precio PsicolÃ³gico
         function applyPsychologicalPrice(amount) {
-            // Devuelve valor con formato de precio impar o redondo (.00 / .99)
             return Math.floor(amount) + 0.99;
         }
 
-        // Lógica de cálculo general
+        // LÃ³gica de cÃ¡lculo general
         function calculateTotal() {
             let size = document.getElementById('size').value;
             let qty = parseInt(document.getElementById('quantity').value) || 1;
             let hasAddon = document.getElementById('addon').checked;
             let distance = parseInt(document.getElementById('distance').value);
 
-            // 1. Precio base según talla
             let unitPrice = basePrices[size];
 
-            // 2. Regla de descuento por mayoreo
             let discountRate = 0;
             if (qty >= 6) {
-                discountRate = 0.20; // 20%
+                discountRate = 0.20;
             } else if (qty >= 3) {
-                discountRate = 0.10; // 10%
+                discountRate = 0.10;
             }
 
-            let discountedUnitPrice = unitPrice * (1 - discountRate);
-            
-            // Aplicar precio psicológico al precio unitario con descuento
-            discountedUnitPrice = applyPsychologicalPrice(discountedUnitPrice);
-
+            let discountedUnitPrice = applyPsychologicalPrice(unitPrice * (1 - discountRate));
             let productTotal = discountedUnitPrice * qty;
 
-            // 3. Adicionales
             if (hasAddon) {
                 productTotal += (addonPrice * qty);
             }
 
-            // 4. Envío
             let shippingTotal = distance * 3;
-
-            // 5. Total Bruto (Incluye producto + envío)
             let grandTotal = productTotal + shippingTotal;
 
-            // 6. Desglose de IVA (16%)
             let subtotal = grandTotal / 1.16;
             let tax = grandTotal - subtotal;
 
-            // Renderizar en UI
             document.getElementById('display-price').innerText = `$${grandTotal.toFixed(2)} MXN`;
             document.getElementById('display-subtotal').innerText = `Subtotal: $${subtotal.toFixed(2)} + IVA (16%): $${tax.toFixed(2)}`;
 
@@ -522,12 +588,15 @@
                 shippingTotal: shippingTotal,
                 subtotal: subtotal,
                 tax: tax,
-                grandTotal: grandTotal
+                grandTotal: grandTotal,
+                address: document.getElementById('destination-input').value
             };
         }
 
         // Abrir y Cerrar Modal
         function openModal() {
+            let address = document.getElementById('destination-input').value;
+            document.getElementById('modal-address').value = address || "Sin especificar";
             document.getElementById('checkoutModal').style.display = 'flex';
         }
 
@@ -540,7 +609,7 @@
             e.preventDefault();
             let data = calculateTotal();
 
-            // Llenar Recibo
+            document.getElementById('rec-dest').innerText = data.address;
             document.getElementById('rec-size').innerText = data.size;
             document.getElementById('rec-qty').innerText = data.qty;
             document.getElementById('rec-base').innerText = `$${data.unitPrice.toFixed(2)}`;
@@ -551,7 +620,6 @@
             document.getElementById('rec-tax').innerText = `$${data.tax.toFixed(2)}`;
             document.getElementById('rec-total').innerText = `$${data.grandTotal.toFixed(2)}`;
 
-            // Ocultar Formulario y Mostrar Ticket
             document.getElementById('paymentForm').style.display = 'none';
             document.getElementById('receiptBlock').style.display = 'block';
         }
